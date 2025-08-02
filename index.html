@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CotAi Edge - Sistema Inteligente de Gestão de Cotações</title>
+    <meta name="description" content="Sistema integrado de gestão de cotações com inteligência artificial, automatizando todo o ciclo de compras empresariais com integração ao PNCP.">
+    <meta name="keywords" content="cotações, licitações, PNCP, procurement, compras públicas, inteligência artificial">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cotai.edge">
+    <meta property="og:title" content="CotAi Edge - Sistema Inteligente de Gestão de Cotações">
+    <meta property="og:description" content="Automatize seu processo de cotações com IA e integração ao Portal Nacional de Contratações Públicas">
+    <meta property="og:image" content="/og-image.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://cotai.edge">
+    <meta property="twitter:title" content="CotAi Edge - Sistema Inteligente de Gestão de Cotações">
+    <meta property="twitter:description" content="Automatize seu processo de cotações com IA e integração ao Portal Nacional de Contratações Públicas">
+    <meta property="twitter:image" content="/og-image.jpg">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <style>
+        :root {
+            --primary-color: #0f172a;
+            --secondary-color: #1e293b;
+            --accent-color: #3b82f6;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--primary-color);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .cta-button {
+            background: var(--gradient);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background: radial-gradient(circle at 30% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+            position: relative;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-text p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--accent-color);
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .hero-image {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .dashboard-preview {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 5rem 0;
+            background: rgba(30, 41, 59, 0.3);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: rgba(30, 41, 59, 0.5);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+        }
+
+        /* Stats Section */
+        .stats {
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .stat-item h3 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-item p {
+            color: var(--text-secondary);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary-color);
+            padding: 3rem 0 1rem;
+            margin-top: 5rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .footer-section a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--text-primary);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1rem;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .dashboard-preview {
+                margin-top: 2rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        /* Scroll animations */
+        .scroll-animate {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .scroll-animate.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="container">
+            <div class="logo">CotAi Edge</div>
+            <ul class="nav-links">
+                <li><a href="#inicio">Início</a></li>
+                <li><a href="#recursos">Recursos</a></li>
+                <li><a href="#sobre">Sobre</a></li>
+                <li><a href="#contato">Contato</a></li>
+            </ul>
+            <a href="https://app.cotai.edge" class="cta-button">Acessar Sistema</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="hero">
+        <div class="container">
+            <div class="hero-content animate-fade-in-up">
+                <div class="hero-text">
+                    <h1>Revolucione suas Cotações com Inteligência Artificial</h1>
+                    <p>Sistema integrado de gestão de cotações que automatiza todo o ciclo de compras empresariais com integração ao PNCP e análise inteligente de documentos.</p>
+                    <div class="hero-buttons">
+                        <a href="https://app.cotai.edge" class="cta-button">Teste Grátis por 7 Dias</a>
+                        <a href="#recursos" class="btn-secondary">Conheça os Recursos</a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <div class="dashboard-preview">
+                        <h3 style="margin-bottom: 1rem; text-align: center;">Dashboard Inteligente</h3>
+                        <div style="display: grid; gap: 1rem;">
+                            <div style="background: rgba(59, 130, 246, 0.2); padding: 1rem; border-radius: 10px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span>Cotações Ativas</span>
+                                    <strong style="color: #3b82f6;">247</strong>
+                                </div>
+                            </div>
+                            <div style="background: rgba(34, 197, 94, 0.2); padding: 1rem; border-radius: 10px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span>Finalizadas</span>
+                                    <strong style="color: #22c55e;">1,532</strong>
+                                </div>
+                            </div>
+                            <div style="background: rgba(168, 85, 247, 0.2); padding: 1rem; border-radius: 10px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span>Fornecedores</span>
+                                    <strong style="color: #a855f7;">89</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="recursos" class="features">
+        <div class="container">
+            <h2 class="section-title scroll-animate">Recursos Principais</h2>
+            <div class="features-grid">
+                <div class="feature-card scroll-animate">
+                    <div class="feature-icon">🤖</div>
+                    <h3>Extração Inteligente de Documentos</h3>
+                    <p>OCR e IA para extrair dados de editais em múltiplos formatos com 95% de precisão. Análise semântica automática de requisitos e especificações.</p>
+                </div>
+                <div class="feature-card scroll-animate">
+                    <div class="feature-icon">🏛️</div>
+                    <h3>Integração com PNCP</h3>
+                    <p>Monitoramento automático de oportunidades no Portal Nacional de Contratações Públicas. Sincronização em tempo real de editais e resultados.</p>
+                </div>
+                <div class="feature-card scroll-animate">
+                    <div class="feature-icon">📊</div>
+                    <h3>Kanban Dinâmico</h3>
+                    <p>Gestão visual de cotações com status em tempo real. Arrastar e soltar para atualizar fluxos de trabalho e acompanhar progresso.</p>
+                </div>
+                <div class="feature-card scroll-animate">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Matching Inteligente de Fornecedores</h3>
+                    <p>IA recomenda os melhores fornecedores baseado no histórico, performance e adequação aos requisitos do edital.</p>
+                </div>
+                <div class="feature-card scroll-animate">
+                    <div class="feature-icon">✅</div>
+                    <h3>Assinatura Digital</h3>
+                    <p>Integração com ICP-Brasil e DocuSign para validação e assinatura eletrônica de documentos com certificação digital.</p>
+                </div>
+                <div class="feature-card scroll-animate">
+                    <div class="feature-icon">📱</div>
+                    <h3>Notificações Multicanal</h3>
+                    <p>Envio automático via e-mail e WhatsApp. Controle de status de entrega e visualização em tempo real.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item scroll-animate">
+                    <h3>5000+</h3>
+                    <p>Cotações Processadas</p>
+                </div>
+                <div class="stat-item scroll-animate">
+                    <h3>95%</h3>
+                    <p>Precisão na Extração</p>
+                </div>
+                <div class="stat-item scroll-animate">
+                    <h3>&lt;3s</h3>
+                    <p>Tempo de Processamento</p>
+                </div>
+                <div class="stat-item scroll-animate">
+                    <h3>99.9%</h3>
+                    <p>Disponibilidade</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="sobre" class="features" style="background: rgba(15, 23, 42, 0.5);">
+        <div class="container">
+            <h2 class="section-title scroll-animate">Sobre o CotAi Edge</h2>
+            <div style="max-width: 800px; margin: 0 auto; text-align: center;">
+                <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 2rem;" class="scroll-animate">
+                    Desenvolvido para departamentos de compras que precisam de eficiência e precisão, o CotAi Edge combina inteligência artificial com automação para revolucionar o processo de cotações empresariais.
+                </p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 3rem;">
+                    <div class="scroll-animate">
+                        <h3 style="color: var(--text-primary); margin-bottom: 1rem;">Para Empresas</h3>
+                        <p style="color: var(--text-secondary);">Médias e grandes empresas que precisam otimizar seus processos de procurement e compliance.</p>
+                    </div>
+                    <div class="scroll-animate">
+                        <h3 style="color: var(--text-primary); margin-bottom: 1rem;">Para Consultores</h3>
+                        <p style="color: var(--text-secondary);">Profissionais autônomos que gerenciam múltiplos clientes e precisam de eficiência operacional.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contato">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>CotAi Edge</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        Sistema inteligente de gestão de cotações com IA e integração PNCP.
+                    </p>
+                    <p style="color: var(--text-secondary);">
+                        Automatize, otimize e revolucione seu processo de compras.
+                    </p>
+                </div>
+                <div class="footer-section">
+                    <h3>Recursos</h3>
+                    <a href="#">Dashboard Analytics</a>
+                    <a href="#">Extração de Documentos</a>
+                    <a href="#">Integração PNCP</a>
+                    <a href="#">Gestão de Fornecedores</a>
+                    <a href="#">Relatórios e KPIs</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Empresa</h3>
+                    <a href="#">Sobre Nós</a>
+                    <a href="#">Casos de Sucesso</a>
+                    <a href="#">Blog</a>
+                    <a href="#">Carreiras</a>
+                    <a href="#">Contato</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Suporte</h3>
+                    <a href="#">Documentação</a>
+                    <a href="#">API Reference</a>
+                    <a href="#">Centro de Ajuda</a>
+                    <a href="#">Status do Sistema</a>
+                    <a href="#">Contato Técnico</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 CotAi Edge. Todos os direitos reservados. | LGPD Compliant | ISO 27001</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Header background on scroll
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(15, 23, 42, 0.98)';
+            } else {
+                header.style.background = 'rgba(15, 23, 42, 0.95)';
+            }
+        });
+
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.scroll-animate').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Counter animation for stats
+        function animateCounter(element, target) {
+            let current = 0;
+            const increment = target / 100;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    element.textContent = target + (element.textContent.includes('%') ? '%' : 
+                                                element.textContent.includes('s') ? 's' : 
+                                                element.textContent.includes('+') ? '+' : '');
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(current) + (element.textContent.includes('%') ? '%' : 
+                                                              element.textContent.includes('s') ? 's' : 
+                                                              element.textContent.includes('+') ? '+' : '');
+                }
+            }, 20);
+        }
+
+        // Trigger counter animations when stats section is visible
+        const statsObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counters = entry.target.querySelectorAll('.stat-item h3');
+                    counters.forEach(counter => {
+                        const text = counter.textContent;
+                        const number = parseInt(text.match(/\d+/)[0]);
+                        animateCounter(counter, number);
+                    });
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        });
+
+        const statsSection = document.querySelector('.stats');
+        if (statsSection) {
+            statsObserver.observe(statsSection);
+        }
+    </script>
+</body>
+</html>
