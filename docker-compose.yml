@@ -14,7 +14,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6380:6379"
+      - "6381:6379"
     volumes:
       - redis_data:/data
     networks:
@@ -31,7 +31,7 @@ services:
   ai-service:
     image: cotaiedge-ai-service-lite
     ports:
-      - "8000:8000"  # Changed from 8077 to standard 8000
+      - "8001:8000"  # Changed from 8077 to standard 8000
     environment:
       # Service Configuration
       - DEBUG=false
@@ -105,7 +105,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "3001:3000"
+      - "3002:3000"
     environment:
       - NODE_ENV=production
       - SUPABASE_URL=https://api.neuro-ia.es
@@ -139,8 +139,8 @@ services:
       - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY:-your_anon_key_here}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-your_service_role_key_here}
       - JWT_SECRET=${JWT_SECRET:-your-jwt-secret-here}
-      - NEXT_PUBLIC_AI_SERVICE_URL=http://localhost:8000
-      - NEXT_PUBLIC_BACKEND_URL=http://localhost:3001
+      - NEXT_PUBLIC_AI_SERVICE_URL=http://localhost:8001
+      - NEXT_PUBLIC_BACKEND_URL=http://localhost:3002
     depends_on:
       backend:
         condition: service_healthy
