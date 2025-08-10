@@ -1,0 +1,58 @@
+# Core Docling dependencies
+docling==2.18.0
+
+# OCR engines
+easyocr
+rapidocr-onnxruntime
+tesserocr
+
+# spaCy layout integration
+spacy>=3.7.0
+spacy-layout
+
+# Machine Learning & NLP
+torch>=2.0.0
+torchvision
+transformers>=4.35.0
+numpy>=1.24.4,<3.0.0
+
+# Document processing
+pypdfium2
+python-docx
+openpyxl
+pillow
+pydantic>=2.0.0
+
+# API & Web
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-multipart
+httpx
+requests
+
+# Database & Cache
+supabase>=2.0.0
+redis>=5.0.0
+
+# Utilities
+python-dotenv
+pyyaml
+pathlib
+typing-extensions
+dataclasses-json
+
+# Quality & Testing
+pytest>=7.0.0
+pytest-asyncio
+black
+flake8
+mypy
+
+# Monitoring & Logging
+structlog
+sentry-sdk
+
+# Additional ML models (optional)
+# ollama
+# mlx-lm  # For Apple Silicon
+# flash-attn  # For CUDA acceleration

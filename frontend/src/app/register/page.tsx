@@ -27,6 +27,18 @@ interface RegisterFormData {
   acceptTerms: boolean
 }
 
+interface RegisterFormErrors {
+  companyName?: string
+  cnpj?: string
+  companyEmail?: string
+  companyPhone?: string
+  userName?: string
+  userEmail?: string
+  password?: string
+  confirmPassword?: string
+  acceptTerms?: string
+}
+
 export default function RegisterPage() {
   const router = useRouter()
   const { toast } = useToast()
@@ -46,11 +58,11 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [errors, setErrors] = useState<Partial<RegisterFormData>>({})
+  const [errors, setErrors] = useState<RegisterFormErrors>({})
 
   // Validação do formulário
   const validateForm = (): boolean => {
-    const newErrors: Partial<RegisterFormData> = {}
+    const newErrors: RegisterFormErrors = {}
 
     // Validação da empresa
     if (!formData.companyName.trim()) {

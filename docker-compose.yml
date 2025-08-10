@@ -1,0 +1,173 @@
+# CotAi Edge - Complete containerized deployment
+
+networks:
+  cotai-network:
+    driver: bridge
+
+volumes:
+  redis_data:
+  ai_models:
+  ai_storage:
+
+services:
+  # Redis Cache Service
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - cotai-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # AI Service (Python FastAPI with Docling)
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"  # Changed from 8077 to standard 8000
+    environment:
+      # Service Configuration
+      - DEBUG=false
+      - LOG_LEVEL=INFO
+      - HOST=0.0.0.0
+      - PORT=8000
+      
+      # Docling Configuration
+      - DOCLING_ARTIFACTS_PATH=/app/models
+      - DOCLING_ENABLE_REMOTE_SERVICES=false
+      
+      # OCR Configuration  
+      - OCR_ENGINE=easyocr
+      - OCR_LANGUAGES=pt,en
+      - OCR_USE_GPU=false  # Set to true if GPU available
+      
+      # Processing Limits
+      - MAX_FILE_SIZE=52428800  # 50MB
+      - MAX_PAGES=1000
+      - OMP_NUM_THREADS=4
+      
+      # Quality Thresholds
+      - QUALITY_THRESHOLD_EXCELLENT=0.9
+      - QUALITY_THRESHOLD_GOOD=0.7
+      - QUALITY_THRESHOLD_FAIR=0.5
+      
+      # Storage
+      - STORAGE_ROOT_PATH=/app/storage
+      - TEMP_DIRECTORY_PATH=/app/temp
+      - RESULTS_DIRECTORY_PATH=/app/results
+      
+      # Database (Remote Supabase)
+      - SUPABASE_URL=https://api.neuro-ia.es
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY:-your_anon_key_here}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-your_service_role_key_here}
+      
+      # Cache
+      - REDIS_URL=redis://redis:6379
+      - CACHE_TTL=3600
+      
+      # Security
+      - JWT_SECRET=${JWT_SECRET:-your-jwt-secret-here}
+      - ALLOWED_ORIGINS=*
+      
+      # LLM Configuration (Optional - for local models)
+      - LLM_MODEL=llama-3.2
+      - LLM_ENDPOINT=http://localhost:11434
+      - LLM_MAX_TOKENS=4096
+    volumes:
+      - ai_storage:/app/storage
+      - ai_models:/app/models
+      - ./ai-service/temp:/app/temp
+      - ./ai-service/results:/app/results
+      - ./ai-service/logs:/app/logs
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - cotai-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s  # Longer start period for model downloads
+
+  # Backend Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+      - SUPABASE_URL=https://api.neuro-ia.es
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-your_service_role_key_here}
+      - JWT_SECRET=${JWT_SECRET:-your-jwt-secret-here}
+      - REDIS_URL=redis://redis:6379
+      - AI_SERVICE_URL=http://ai-service:8000
+    depends_on:
+      - redis
+      - ai-service
+    networks:
+      - cotai-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"  # Changed from 3077 to standard 3000
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_SUPABASE_URL=https://api.neuro-ia.es
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY:-your_anon_key_here}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-your_service_role_key_here}
+      - JWT_SECRET=${JWT_SECRET:-your-jwt-secret-here}
+      - NEXT_PUBLIC_AI_SERVICE_URL=http://localhost:8000
+      - NEXT_PUBLIC_BACKEND_URL=http://localhost:3001
+    depends_on:
+      backend:
+        condition: service_healthy
+      ai-service:
+        condition: service_healthy
+    networks:
+      - cotai-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "/app/healthcheck.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  # Cloudflare Tunnel (Optional)
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - frontend
+      - backend
+      - ai-service
+    networks:
+      - cotai-network
+    restart: unless-stopped
+    profiles:
+      - production  # Only start with --profile production
