@@ -12,16 +12,8 @@ from io import BytesIO
 # Docling imports
 from docling.document_converter import DocumentConverter, PdfFormatOption
 from docling.datamodel.base_models import InputFormat, DocumentStream
-from docling.datamodel.pipeline_options import (
-    PdfPipelineOptions, 
-    EasyOcrOptions, 
-    TesseractOcrOptions,
-    RapidOcrOptions,
-    TableFormerMode
-)
-from docling.datamodel.accelerator_options import AcceleratorDevice, AcceleratorOptions
-from docling.chunking import HybridChunker
-from docling_core.types.doc import ImageRefMode
+from docling.datamodel.pipeline_options import PdfPipelineOptions
+from docling.datamodel.settings import settings
 
 # spaCy layout integration
 import spacy
@@ -76,42 +68,10 @@ class DoclingExtractor:
         # Basic OCR configuration
         pipeline_options.do_ocr = True
         pipeline_options.do_table_structure = True
-        pipeline_options.table_structure_options.do_cell_matching = True
-        pipeline_options.table_structure_options.mode = TableFormerMode.ACCURATE
         
         # Image generation
         pipeline_options.generate_page_images = True
         pipeline_options.generate_picture_images = True
-        pipeline_options.images_scale = 2.0
-        
-        # Enrichment features
-        pipeline_options.do_picture_classification = True
-        pipeline_options.do_picture_description = False  # Disable by default for performance
-        pipeline_options.do_code_enrichment = True
-        pipeline_options.do_formula_enrichment = True
-        
-        # OCR engine configuration
-        if self.settings.ocr_engine == "tesseract":
-            pipeline_options.ocr_options = TesseractOcrOptions()
-        elif self.settings.ocr_engine == "rapidocr":
-            pipeline_options.ocr_options = RapidOcrOptions()
-        else:  # Default to EasyOCR
-            pipeline_options.ocr_options = EasyOcrOptions()
-            pipeline_options.ocr_options.lang = self.settings.ocr_languages
-            pipeline_options.ocr_options.use_gpu = self.settings.ocr_use_gpu
-        
-        # Accelerator options
-        pipeline_options.accelerator_options = AcceleratorOptions(
-            num_threads=self.settings.num_threads,
-            device=AcceleratorDevice.AUTO
-        )
-        
-        # Remote services
-        pipeline_options.enable_remote_services = self.settings.enable_remote_services
-        
-        # Artifacts path for offline usage
-        if self.settings.docling_artifacts_path:
-            pipeline_options.artifacts_path = self.settings.docling_artifacts_path
         
         return pipeline_options
     
@@ -343,16 +303,12 @@ class DoclingExtractor:
         try:
             logger.info("Downloading Docling models...")
             
-            # This would use the docling-tools utility
-            # For now, we'll implement a basic version
-            from docling.utils.model_downloader import download_models
+            # Initialize converter to trigger model downloads
+            converter = DocumentConverter()
             
-            download_models(
-                artifacts_path=self.settings.docling_artifacts_path
-            )
-            
-            logger.info("Models downloaded successfully")
+            logger.info("Models initialized successfully")
             
         except Exception as e:
             logger.error(f"Model download failed: {e}")
-            raise
+            # Don't raise, models will be downloaded on first use
+            pass

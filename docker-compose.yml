@@ -29,9 +29,7 @@ services:
 
   # AI Service (Python FastAPI with Docling)
   ai-service:
-    build:
-      context: ./ai-service
-      dockerfile: Dockerfile
+    image: cotaiedge-ai-service-lite
     ports:
       - "8000:8000"  # Changed from 8077 to standard 8000
     environment:

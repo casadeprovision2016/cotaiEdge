@@ -1,0 +1,66 @@
+# CotAi Edge AI Service - Lightweight version for testing
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV DOCLING_ARTIFACTS_PATH="/app/models"
+
+# Install only essential system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Create non-root user for security
+RUN groupadd -r cotai && useradd -r -g cotai cotai
+
+# Create application directories
+RUN mkdir -p /app/models /app/storage /app/temp /app/logs \
+    && chown -R cotai:cotai /app
+
+# Set working directory
+WORKDIR /app
+
+# Copy application code
+COPY --chown=cotai:cotai . .
+
+# Install minimal Python dependencies for testing
+RUN pip install --no-cache-dir \
+    fastapi==0.116.1 \
+    uvicorn[standard]==0.35.0 \
+    python-multipart \
+    pydantic>=2.0.0 \
+    python-dotenv \
+    structlog
+
+# Create simple startup script
+RUN cat > /app/start-lite.sh << 'EOF'
+#!/bin/bash
+set -e
+
+echo "🚀 Starting CotAi Edge AI Service (Lite Mode)..."
+
+# Create necessary directories
+mkdir -p /app/models /app/storage /app/temp /app/logs
+
+# Start the service
+echo "🎯 Starting FastAPI server..."
+exec uvicorn main_lite:app --host 0.0.0.0 --port 8000 --workers 1
+EOF
+
+RUN chmod +x /app/start-lite.sh && chown cotai:cotai /app/start-lite.sh
+
+# Switch to non-root user
+USER cotai
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Default command
+CMD ["/app/start-lite.sh"]
